@@ -1,6 +1,5 @@
 from pokemons_game import db, app
 
-
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(length=30), nullable=False, unique=True)
@@ -24,7 +23,7 @@ class Item(db.Model):
     def __repr__(self):
         return f'Item {self.name}'
 
-    
+
 pokemon_abilities = db.Table(
     "pokemon_abilities",
     db.Column("pokemon_id", db.Integer, db.ForeignKey("pokemon.id")),
@@ -34,7 +33,7 @@ pokemon_abilities = db.Table(
 pokemon_types = db.Table(
     "pokemon_types",
     db.Column("pokemon_id", db.Integer, db.ForeignKey("pokemon.id")),
-    db.Column("pokemon_type_id", db.Integer, db.ForeignKey("pokemon_type.id")),
+    db.Column("type_id", db.Integer, db.ForeignKey("type.id")),
 )
 
 
@@ -45,16 +44,14 @@ class Pokemon(db.Model):
     max_hp = db.Column(db.Integer(), nullable=False)
     current_hp = db.Column(db.Integer(), nullable=False)
     speed = db.Column(db.Integer(), nullable=False)
-    type = db.relationship('PokemonType', secondary=pokemon_types, primaryjoin=(pokemon_types.c.pokemon_id==id),backref='pokemons', lazy=True)
+    type = db.relationship('Type', secondary=pokemon_types, primaryjoin=(pokemon_types.c.pokemon_id==id),backref='pokemons', lazy=True)
     abilities = db.relationship('Ability', secondary=pokemon_abilities, primaryjoin=(pokemon_abilities.c.pokemon_id==id), backref='pokemons', lazy=True)
 
-
-class PokemonType(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(length=30), nullable=False, unique=True)
+    def __repr__(self):
+        return f'Pokemon {self.name}'
 
 
-class AbilityType(db.Model):
+class Type(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(length=30), nullable=False, unique=True)
 
@@ -64,8 +61,9 @@ class Ability(db.Model):
     name = db.Column(db.String(length=30), nullable=False, unique=True)
     damage = db.Column(db.Integer(), nullable=False)
     accuracy = db.Column(db.Integer(), nullable=False)
-    type = db.Column(db.Integer, db.ForeignKey('ability_type.id'), nullable=False)
-    
+    type = db.Column(db.Integer, db.ForeignKey('type.id'), nullable=False)
+
 
 with app.app_context():
     db.create_all()
+
