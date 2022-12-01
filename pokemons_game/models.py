@@ -25,30 +25,47 @@ class Item(db.Model):
         return f'Item {self.name}'
 
     
+pokemon_abilities = db.Table(
+    "pokemon_abilities",
+    db.Column("pokemon_id", db.Integer, db.ForeignKey("pokemon.id")),
+    db.Column("ability_id", db.Integer, db.ForeignKey("ability.id")),
+)
+
+pokemon_types = db.Table(
+    "pokemon_types",
+    db.Column("pokemon_id", db.Integer, db.ForeignKey("pokemon.id")),
+    db.Column("pokemon_type_id", db.Integer, db.ForeignKey("pokemon_type.id")),
+)
+
+
 class Pokemon(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(length=30), nullable=False, unique=True)
+    name = db.Column(db.String(length=30), nullable=False)
     damage = db.Column(db.Integer(), nullable=False)
     max_hp = db.Column(db.Integer(), nullable=False)
     current_hp = db.Column(db.Integer(), nullable=False)
     speed = db.Column(db.Integer(), nullable=False)
-    type = db.relationship('PokemonType', backref='owned_type', lazy=True)
-    abilities = db.relationship('Ability', backref='owned_ability', lazy=True)
+    type = db.relationship('PokemonType', secondary=pokemon_types, primaryjoin=(pokemon_types.c.pokemon_id==id),backref='pokemons', lazy=True)
+    abilities = db.relationship('Ability', secondary=pokemon_abilities, primaryjoin=(pokemon_abilities.c.pokemon_id==id), backref='pokemons', lazy=True)
+
 
 class PokemonType(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(length=30), nullable=False, unique=True)
 
+
 class AbilityType(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(length=30), nullable=False, unique=True)
+
 
 class Ability(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(length=30), nullable=False, unique=True)
     damage = db.Column(db.Integer(), nullable=False)
     accuracy = db.Column(db.Integer(), nullable=False)
-
+    type = db.Column(db.Integer, db.ForeignKey('ability_type.id'), nullable=False)
+    
 
 with app.app_context():
     db.create_all()
