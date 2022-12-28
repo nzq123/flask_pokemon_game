@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}
+    Pokemons
+{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover table-dark">
+    <thead>
+        <tr>
+            <!-- Your Columns HERE -->
+            <th scope="col">Name</th>
+            <th scope="col">Damage</th>
+            <th scope="col">Max_hp</th>
+            <th scope="col">Speed</th>
+            <th scope="col">Type</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Your rows inside the table HERE: -->
+            {% for pokemon in pokemons %}
+                <tr>
+                    <td>{{ pokemon.name|title }}</td>
+                    <td>{{ pokemon.damage }}</td>
+                    <td>{{ pokemon.max_hp}}</td>
+                    <td>{{ pokemon.speed }}</td>
+                    <td>{{ pokemon.type }}</td>
+                    <td>
+                        <button class="btn btn-outline btn-success">Choose</button>
+                        <button class="btn btn-outline btn-danger">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

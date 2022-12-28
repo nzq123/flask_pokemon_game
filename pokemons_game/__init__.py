@@ -8,3 +8,4 @@ db = SQLAlchemy(app)
 from pokemons_game import routes
 from pokemons_game.serializers import to_pokemon, to_ability
 from pokemons_game.models import PokemonModel, TypeModel, AbilityModel
+

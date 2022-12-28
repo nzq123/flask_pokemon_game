@@ -34,7 +34,7 @@ class TypeModel(db.Model):
     name = db.Column(db.String(length=30), nullable=False, unique=True)
 
     def __repr__(self):
-        return f'Type of {self.name}'
+        return f'{self.name}'
 
 
 class AbilityModel(db.Model):
@@ -43,8 +43,10 @@ class AbilityModel(db.Model):
     name = db.Column(db.String(length=30), nullable=False, unique=True)
     damage = db.Column(db.Integer(), nullable=False)
     accuracy = db.Column(db.Integer(), nullable=False)
-    type = db.Column(db.Integer, db.ForeignKey('type.id'), nullable=False)
+    # type = db.Column(db.Integer, db.ForeignKey('type.id'), nullable=False)
     # type = db.relationship('TypeModel', backref='ability', lazy=True)
+    type = db.Column(db.Integer, db.ForeignKey('type.id'), nullable=False)
+    type_data = db.relationship('TypeModel', backref='ability', lazy=True)
 
     def __repr__(self):
         return f'Ability {self.name}'
@@ -53,4 +55,3 @@ class AbilityModel(db.Model):
 with app.app_context():
     db.create_all()
 
-# AbilityModel.query.all().filter
