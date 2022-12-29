@@ -2,6 +2,10 @@ from pokemons_game import app, db
 from flask import render_template, redirect, url_for, request, jsonify
 from pokemons_game.models import PokemonModel, TypeModel
 from pokemons_game.pokemon import PokemonType
+from pokemons_game.pokemon import PokemonType
+from flask_wtf import Form
+from wtforms import StringField, IntegerField
+from wtforms.validators import InputRequired, Length
 import json
 import requests
 
@@ -17,11 +21,46 @@ def pokemons():
     return render_template('pokemons.html', pokemons=PokemonModel.query.all())
 
 
+# class AddPokemonForm(Form):
+#     name = StringField('name', validators=[InputRequired(), Length])
+#     damage = IntegerField('damage', validators=)
+#     max_hp =
+#     speed =
+#     type =
+
+
 @app.route('/pokemon', methods=['GET', 'POST'])
 def pokemon():
     if request.method == 'POST':
         body = request.get_json()
-        # poke_types = []
+        errors = []
+        if not isinstance(body['name'], str):
+            errors.append({'error': 'Name of pokemon has to be string'})
+        else:
+            if body['name'].isalpha():
+                errors.append({'error': 'Name of pokemon contains only letters'})
+        if not isinstance(body['damage'], int):
+            errors.append({'error': 'Damage of pokemon has to be int'})
+        if not isinstance(body['max_hp'], int):
+            errors.append({'error': 'Max_hp of pokemon has to be int'})
+        if not isinstance(body['speed'], int):
+            errors.append({'error': 'Speed of pokemon has to be int'})
+        if len(body["type"]) > 2:
+            errors.append({'error': "Pokemon has max two types"})
+        for i in body["type"]:
+            if not isinstance(i, str):
+                errors.append({'error': 'Type of pokemon has to array of str'})
+        for i in range(len(body["type"])):
+            body["type"][i] = body["type"][i].lower()
+        for i in body["type"]:
+            try:
+                PokemonType(i)
+            except ValueError:
+                errors.append({'error': "You have to give valid pokemon type"})
+
+        if len(errors) != 0:
+            return errors
+
         poke = PokemonModel(name=body['name'], damage=body['damage'], max_hp=body['max_hp'],
                             current_hp=body['max_hp'], speed=body['speed'],
                             type=TypeModel.query.filter(TypeModel.name.in_(body["type"])).all())
@@ -55,6 +94,10 @@ def pokemon_delete(id_):
 def type_pokemon():
     if request.method == 'POST':
         body = request.form
+        try:
+            PokemonType(body['name'])
+        except ValueError:
+            return {'error': 'This pokemon type doesnt exist'}
         type = TypeModel(name=body['name'])
         db.session.add(type)
         db.session.commit()
